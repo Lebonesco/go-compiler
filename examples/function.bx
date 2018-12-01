@@ -1,0 +1,21 @@
+func add(a int, b int) int {
+    return a + b;
+}
+
+func hello(name string) string {
+    return "hello:" + " " + name;
+}
+
+let num = int add(1, 2);
+let phrase = string hello("Jeff");
+let i = int 0;
+let result = string "";
+
+for i < num {
+    i = i + 1
+    if (i == 2) {
+        result = hello("cat");
+    } else {
+        result = hello("dog");
+    }
+}

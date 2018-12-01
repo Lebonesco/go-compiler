@@ -1,2 +1,7 @@
-# go-compiler
-a simple compiler in go
+# Go Compiler
+
+* Lexer
+* Parser
+* AST (Abstract Syntax Tree)
+* Type Checking
+* Code Generation

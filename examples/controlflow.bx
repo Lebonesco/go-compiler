@@ -1,0 +1,9 @@
+func test(x int) int {
+	var y int;
+	if x > 5 {
+		y = 5;
+	} else {
+		y = 8;
+	}
+	return y;
+}

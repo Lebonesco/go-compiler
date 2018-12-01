@@ -1,0 +1,44 @@
+/* Lexical Parser */
+!whitespace '\t' | '\n' | '\r' | ' ' ;
+!lineComment  : '/' '/' { . } '\n' ;
+
+_letter : 'A'-'Z' | 'a'-'z' | '_' ;
+_digit : '0'-'9' ;
+_alpha : _letter | _digit ;
+
+string_literal : '"' {_alpha} '"' ;
+int : '0' | 1'-'9' {_digit} ;
+ident : _letter {_alpha} ;
+
+/* keywords */
+func : 'f' 'u' 'n' 'c' ;
+let : 'l' 'e' 't' ;
+if : 'i' 'f' ;
+elif : 'e' 'l' 'i' 'f' ;
+else : 'e' 'l' 's' 'e' ;
+for : 'f' 'o' 'r' ;
+return : 'r' 'e' 't' 'u' 'r' 'n' ;
+true : 't' 'r' 'u' 'e' ;
+false : 'f' 'a' 'l' 's' 'e' ;
+
+/* punctuation */
+plus : '+' ;
+minus : '-' ;
+mul : '*' ;
+div : '/' ;
+
+eq : '=' '=' ;
+atmost : '<' '=' ;
+lt : '<' ;
+atleast : '>' '=' ;
+gt : '>' ;
+
+lbrace : '{' ;
+rbrace : '}' ;
+assign : '=' ;
+lparen : '(' ;
+rparen : ')' ;
+comma : ',' ;
+semicolon : ';' ;
+period : '.' ;
+colon : ':' ;
