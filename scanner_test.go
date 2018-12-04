@@ -6,7 +6,13 @@ import (
 	"testing"
 )
 
-const input = `
+type Test struct {
+	expectedType    token.Type
+	expectedLiteral string
+}
+
+func TestToken(t *testing.T) {
+	const input = `
 			/* comment should not be scanned */
 			let five = "test";
 			let ten = 10;
@@ -24,14 +30,9 @@ const input = `
 			}
 
 			10 == 10;
+			func add(x int
 			`
 
-type Test struct {
-	expectedType    token.Type
-	expectedLiteral string
-}
-
-func TestToken(t *testing.T) {
 	tests := []Test{
 		{token.TokMap.Type("let"), "let"},
 		{token.TokMap.Type("ident"), "five"},
@@ -96,14 +97,14 @@ func TestToken(t *testing.T) {
 		{token.TokMap.Type("eq"), "=="},
 		{token.TokMap.Type("int"), "10"},
 		{token.TokMap.Type("semicolon"), ";"},
+		{token.TokMap.Type("func"), "func"},
+		{token.TokMap.Type("ident"), "add"},
+		{token.TokMap.Type("lparen"), "("},
+		{token.TokMap.Type("ident"), "x"},
+		{token.TokMap.Type("ident"), "int"},
 		{token.TokMap.Type("$"), ""}, // end token
 	}
 
-	runTest(tests, INPUT1, t)
-}
-
-// pass input through checker
-func runTest(tests []Test, input string, t *testing.T) {
 	l := lexer.NewLexer([]byte(input))
 	for i, tt := range tests {
 		tok := l.Scan()
