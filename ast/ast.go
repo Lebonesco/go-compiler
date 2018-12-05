@@ -3,53 +3,52 @@ package ast
 import (
 	"fmt"
 	"github.com/Lebonesco/go-compiler/token"
-	"strconv"
 )
 
 // interface methods
 
-func (p *Program) TokenLiteral() string { return "Program" }
+func (p Program) TokenLiteral() string { return "Program" }
 
 // Statements
-func (ls *AssignStatement) statementNode()       {}
-func (ls *AssignStatement) TokenLiteral() string { return "AssignStatement" }
+func (ls AssignStatement) statementNode()       {}
+func (ls AssignStatement) TokenLiteral() string { return "AssignStatement" }
 
-func (rs *ReturnStatement) statementNode()       {}
-func (rs *ReturnStatement) TokenLiteral() string { return "ReturnStatement" }
+func (rs ReturnStatement) statementNode()       {}
+func (rs ReturnStatement) TokenLiteral() string { return "ReturnStatement" }
 
-func (es *ExpressionStatement) statementNode()       {}
-func (es *ExpressionStatement) TokenLiteral() string { return "ExpressionStatement" }
+func (es ExpressionStatement) statementNode()       {}
+func (es ExpressionStatement) TokenLiteral() string { return "ExpressionStatement" }
 
-func (is *IfStatement) statementNode()       {}
-func (is *IfStatement) TokenLiteral() string { return "IfStatement" }
+func (is IfStatement) statementNode()       {}
+func (is IfStatement) TokenLiteral() string { return "IfStatement" }
 
-func (bs *BlockStatement) statementNode()       {}
-func (bs *BlockStatement) TokenLiteral() string { return "BlockStatement" }
+func (bs BlockStatement) statementNode()       {}
+func (bs BlockStatement) TokenLiteral() string { return "BlockStatement" }
 
-func (is *InitStatement) statementNode()       {}
-func (is *InitStatement) TokenLiteral() string { return "InitStatement" }
+func (is InitStatement) statementNode()       {}
+func (is InitStatement) TokenLiteral() string { return "InitStatement" }
 
-func (fs *FunctionStatement) statementNode()       {}
-func (fs *FunctionStatement) TokenLiteral() string { return "FunctionStatement" }
+func (fs FunctionStatement) statementNode()       {}
+func (fs FunctionStatement) TokenLiteral() string { return "FunctionStatement" }
 
 // Expressions
-func (i *Identifier) expressionNode()      {}
-func (i *Identifier) TokenLiteral() string { return string(i.Token.Lit) }
+func (i Identifier) expressionNode()      {}
+func (i Identifier) TokenLiteral() string { return string(i.Token.Lit) }
 
-func (sl *StringLiteral) expressionNode()      {}
-func (sl *StringLiteral) TokenLiteral() string { return string(sl.Token.Lit) }
+func (sl StringLiteral) expressionNode()      {}
+func (sl StringLiteral) TokenLiteral() string { return string(sl.Token.Lit) }
 
-func (b *Boolean) expressionNode()      {}
-func (b *Boolean) TokenLiteral() string { return string(b.Token.Lit) }
+func (b Boolean) expressionNode()      {}
+func (b Boolean) TokenLiteral() string { return string(b.Token.Lit) }
 
-func (il *IntegerLiteral) expressionNode()      {}
-func (il *IntegerLiteral) TokenLiteral() string { return string(il.Token.Lit) }
+func (il IntegerLiteral) expressionNode()      {}
+func (il IntegerLiteral) TokenLiteral() string { return string(il.Token.Lit) }
 
-func (oe *InfixExpression) expressionNode()      {}
-func (oe *InfixExpression) TokenLiteral() string { return string(oe.Token.Lit) }
+func (oe InfixExpression) expressionNode()      {}
+func (oe InfixExpression) TokenLiteral() string { return string(oe.Token.Lit) }
 
-func (fc *FunctionCall) expressionNode()      {}
-func (fc *FunctionCall) TokenLiteral() string { return string(fc.Token.Lit) }
+func (fc FunctionCall) expressionNode()      {}
+func (fc FunctionCall) TokenLiteral() string { return string(fc.Token.Lit) }
 
 func Error(fun, expected, v string, got interface{}) error {
 	return fmt.Errorf("AST construction error: In function: %s, expected %s for %s. got=%T", fun, expected, v, got)
@@ -166,20 +165,20 @@ func NewInfixExpression(left, right, oper Attrib) (Expression, error) {
 		return nil, Error("NewInfixExpression", "Expression", "right", right)
 	}
 
-	return &InfixExpression{Left: l, Operator: string(o.Lit), Right: r, Token: *o}, nil
+	return &InfixExpression{Left: l, Operator: string(o.Lit), Right: r, Token: o}, nil
 }
 
 func NewIntegerLiteral(integer Attrib) (Expression, error) {
-	intLit, _ := integer.(*token.Token)
-	value, err := strconv.ParseInt(string(intLit.Lit), 0, 64)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse %q as integer", string(intLit.Lit))
+	intLit, ok := integer.(*token.Token)
+	if !ok {
+		return nil, Error("NewIntegerLiteral", "*token.Token", "integer", integer)
 	}
-	return &IntegerLiteral{Token: *intLit, Value: string(value)}, nil
+
+	return &IntegerLiteral{Token: intLit, Value: string(intLit.Lit)}, nil
 }
 
 func NewStringLiteral(str Attrib) (Expression, error) {
-	return &StringLiteral{Value: string(str.(*token.Token).Lit), Token: *str.(*token.Token)}, nil
+	return &StringLiteral{Value: string(str.(*token.Token).Lit), Token: str.(*token.Token)}, nil
 }
 
 func NewIdentInit(ident, expr Attrib) (Statement, error) {
@@ -188,11 +187,11 @@ func NewIdentInit(ident, expr Attrib) (Statement, error) {
 		return nil, Error("NewIdentInit", "Expression", "expr", expr)
 	}
 
-	return &InitStatement{Location: string(ident.(*token.Token).Lit), Token: *ident.(*token.Token), Expr: e}, nil
+	return &InitStatement{Location: string(ident.(*token.Token).Lit), Token: ident.(*token.Token), Expr: e}, nil
 }
 
 func NewIdentExpression(ident Attrib) (*Identifier, error) {
-	return &Identifier{Value: string(ident.(*token.Token).Lit), Token: *ident.(*token.Token)}, nil
+	return &Identifier{Value: string(ident.(*token.Token).Lit), Token: ident.(*token.Token)}, nil
 }
 
 func NewBoolExpression(val Attrib) (Expression, error) {
@@ -222,7 +221,7 @@ func NewFunctionCall(name, args Attrib) (Expression, error) {
 		}
 	}
 
-	return &FunctionCall{Name: string(n.Lit), Args: a, Token: *n}, nil
+	return &FunctionCall{Name: string(n.Lit), Args: a, Token: n}, nil
 }
 
 func NewFormalArg() ([]FormalArg, error) {

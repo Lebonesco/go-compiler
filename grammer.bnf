@@ -53,7 +53,7 @@ import (
 >>
 
 Program
-  : Statements
+  : Statements  << ast.NewProgram($0) >>
   ;
  
  Statements
