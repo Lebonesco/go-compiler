@@ -6,12 +6,11 @@ import (
 	"testing"
 )
 
-type Test struct {
-	expectedType    token.Type
-	expectedLiteral string
-}
-
 func TestToken(t *testing.T) {
+	type Test struct {
+		expectedType    token.Type
+		expectedLiteral string
+	}
 	const input = `
 			/* comment should not be scanned */
 			let five = "test";

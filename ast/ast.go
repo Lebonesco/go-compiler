@@ -88,7 +88,7 @@ func NewAssignStatement(left, right Attrib) (Statement, error) {
 		return nil, Error("NewAssignStatement", "Expression", "right", right)
 	}
 
-	return &AssignStatement{Left: l, Right: r}, nil
+	return &AssignStatement{Left: *l, Right: r}, nil
 }
 
 func NewExpressionStatement(expr Attrib) (Statement, error) {

@@ -30,7 +30,7 @@ type Expression interface {
 // Statements
 type AssignStatement struct {
 	Token *token.Token `json:"-"`
-	Left  *Identifier  `json:"left"`
+	Left  Identifier   `json:"left"`
 	Right Expression   `json:"right"`
 }
 
