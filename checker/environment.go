@@ -40,6 +40,14 @@ type Signature struct {
 	Params []string // list of types
 }
 
+type Methods map[string]bool
+
+// type methods
+var TypeTable = map[string]Methods{
+	INT_TYPE:    map[string]bool{"+": true, "-": true, "<=": true, "==": true, ">=": true, "!=": true, "*": true, "/": true},
+	STRING_TYPE: map[string]bool{"+": true},
+	BOOL_TYPE:   map[string]bool{"and": true, "or": true}}
+
 type Environment struct {
 	Vals  map[string]string    // map identifier to type
 	Funcs map[string]Signature // map function name to return type
@@ -48,6 +56,16 @@ type Environment struct {
 
 func NewEnvironment() Environment {
 	return Environment{Vals: map[string]string{}, Funcs: map[string]Signature{}, Types: map[string]bool{}}
+}
+
+func MethodExist(kind, method string) bool {
+	methods, ok := TypeTable[kind]
+	if !ok {
+		return false
+	}
+
+	_, ok = methods[method]
+	return ok
 }
 
 func (e *Environment) Set(name, kind string) {

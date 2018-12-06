@@ -2,6 +2,7 @@ package checker
 
 import (
 	"errors"
+	"fmt"
 	"github.com/Lebonesco/go-compiler/ast"
 )
 
@@ -56,7 +57,6 @@ func evalProgram(p *ast.Program, env *Environment) (string, error) {
 }
 
 // Statements
-
 func evalBlockStatement(node *ast.BlockStatement, env *Environment) (string, error) {
 	for _, statement := range node.Statements {
 		_, err := checker(statement, env)
@@ -79,7 +79,7 @@ func evalIfStatement(node *ast.IfStatement, env *Environment) (string, error) {
 func evalExpressionStatement(node *ast.ExpressionStatement, env *Environment) (string, error) {
 	_, err := checker(node.Expression, env)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return "", nil
@@ -176,18 +176,18 @@ func evalInfixExpression(node *ast.InfixExpression, env *Environment) (string, e
 	}
 
 	// check if method exists in type
-	//methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUALS, "<": LESS, ">": MORE, ">=": ATLEAST,
-	//	"<=": ATMOST, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
+	// methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUALS, "<": LESS, ">": MORE, ">=": ATLEAST,
+	// 	"<=": ATMOST, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
 
-	// if _, ok := env.GetClassMethod(left, methods[node.Operator]); !ok {
-	// 	return environment.Variable{}, createError(METHOD_NOT_EXIST, "method %s not exist in class %s on line %d", methods[node.Operator], obj.Type, node.Token.Pos.Line)
-	// }
+	if !MethodExist(left, node.Operator) {
+		return NOTHING_TYPE, errors.New(fmt.Sprintf("method %s not exist for type %s", node.Operator, left))
+	}
 
-	// switch node.Operator { // evaluates to a bool
-	// case "<", ">", "<=", ">=", "==", "!=", "and", "or":
-	// 	node.Type = string(left.Type)
-	// 	return environment.Variable{Type: environment.BOOL_CLASS}, nil
-	// }
+	for _, opr := range []string{"<=", "<", ">=", ">", "or", "and"} {
+		if node.Operator == opr {
+			return BOOL_TYPE, nil
+		}
+	}
 
-	return "", nil
+	return left, nil
 }

@@ -100,16 +100,16 @@ Expression
 Term
   : Term mul Factor << ast.NewInfixExpression($0, $2, $1) >>
   | Term div Factor << ast.NewInfixExpression($0, $2, $1) >>
+  | string_literal              << ast.NewStringLiteral($0) >>
   | Bool			<< ast.NewBoolExpression($0) >>
   | Factor
   ;
 
 Factor
   : lparen Expression rparen    << $1, nil >>
-  | int 						<< ast.NewIntegerLiteral($0) >>
-  | string_literal 				<< ast.NewStringLiteral($0) >>
-  | ident     << ast.NewIdentExpression($0) >> 
-  | ident lparen Args rparen << ast.NewFunctionCall($0, $2) >>
+  | int 						            << ast.NewIntegerLiteral($0) >>
+  | ident                       << ast.NewIdentExpression($0) >> 
+  | ident lparen Args rparen    << ast.NewFunctionCall($0, $2) >>
   | error
   ;
   

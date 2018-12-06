@@ -31,19 +31,24 @@ func stringToChecker(input string) error {
 
 func TestOperations(t *testing.T) {
 	tests := []Test{
-		Test{`5 + 5;`, true},
-		Test{`5 + "5";`, false},
-		Test{`5 * 5;`, true},
-		Test{`"hello" + " " + "world";`, true},
-		Test{`5 <= 10;`, true},
-		Test{`true and true;`, true},
-		Test{`4 and 2;`, false},
-		Test{`true or false;`, true}}
+		{`5 + 5;`, true},
+		{`5 + "5";`, false},
+		{`5 * 5;`, true},
+		{`5 * 5 + 9;`, true},
+		{`5 <= 10;`, true},
+		{`true and true;`, true},
+		{`4 and 2;`, false},
+		{`true or false;`, true}}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		err := stringToChecker(test.src)
+
 		if err != nil && !test.Success {
-			t.Fatalf(err.Error())
+			continue
+		} else if err != nil {
+			t.Fatalf("test %d fail: "+err.Error(), i)
+		} else if !test.Success {
+			t.Fatalf("test %d should have failed", i)
 		}
 	}
 }
