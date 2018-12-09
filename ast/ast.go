@@ -78,7 +78,7 @@ func AppendStatement(stmtList, stmt Attrib) ([]Statement, error) {
 }
 
 func NewAssignStatement(left, right Attrib) (Statement, error) {
-	l, ok := left.(*Identifier)
+	l, ok := left.(*token.Token)
 	if !ok {
 		return nil, Error("NewAssignStatement", "Identifier", "left", left)
 	}
@@ -88,7 +88,7 @@ func NewAssignStatement(left, right Attrib) (Statement, error) {
 		return nil, Error("NewAssignStatement", "Expression", "right", right)
 	}
 
-	return &AssignStatement{Left: *l, Right: r}, nil
+	return &AssignStatement{Left: Identifier{Value: string(l.Lit)}, Right: r}, nil
 }
 
 func NewExpressionStatement(expr Attrib) (Statement, error) {
@@ -228,10 +228,10 @@ func NewFormalArg() ([]FormalArg, error) {
 	return []FormalArg{}, nil
 }
 
-func AppendFormalArgs(arg, kind, args Attrib) ([]FormalArg, error) {
+func AppendFormalArgs(args, kind, arg Attrib) ([]FormalArg, error) {
 	as, ok := args.([]FormalArg)
 	if !ok {
-		return nil, Error("AppendFormalArgs", "[]FormalArgs", "args", args)
+		return nil, Error("AppendFormalArgs", "[]FormalArg", "args", args)
 	}
 
 	a, ok := arg.(*token.Token)

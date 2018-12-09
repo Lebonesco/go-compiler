@@ -129,7 +129,7 @@ ArgsList
   ;
 
 FormalArgs 
-  : ident ident FormalArgsList << ast.AppendFormalArgs($0, $1, $3) >> 
+  : ident ident FormalArgsList << ast.AppendFormalArgs($0, $1, $2) >> 
   | empty 
   ;
 

@@ -115,6 +115,8 @@ func evalAssignStatement(node *ast.AssignStatement, env *Environment) (string, e
 	return "", nil
 }
 
+// Expressions
+
 func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) {
 	var sig Signature
 	var ok bool
@@ -158,8 +160,6 @@ func evalString(node *ast.StringLiteral, env *Environment) (string, error) {
 	return STRING_TYPE, nil
 }
 
-// Expressions
-
 func evalInfixExpression(node *ast.InfixExpression, env *Environment) (string, error) {
 	left, err := checker(node.Left, env)
 	if err != nil {
@@ -174,10 +174,6 @@ func evalInfixExpression(node *ast.InfixExpression, env *Environment) (string, e
 	if left != right {
 		return "", errors.New("incorrect types for operation")
 	}
-
-	// check if method exists in type
-	// methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUALS, "<": LESS, ">": MORE, ">=": ATLEAST,
-	// 	"<=": ATMOST, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
 
 	if !MethodExist(left, node.Operator) {
 		return NOTHING_TYPE, errors.New(fmt.Sprintf("method %s not exist for type %s", node.Operator, left))
