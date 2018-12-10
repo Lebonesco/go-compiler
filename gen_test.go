@@ -7,6 +7,7 @@ import (
 	"github.com/Lebonesco/go-compiler/gen"
 	"github.com/Lebonesco/go-compiler/lexer"
 	"github.com/Lebonesco/go-compiler/parser"
+	"strings"
 	"testing"
 )
 
@@ -17,24 +18,38 @@ func TestGen(t *testing.T) {
 	}{
 		{
 			src: ``,
-			res: ``}}
+			res: ``},
+		{
+			src: `5 + 5;`,
+			res: `
+			Int tmp_1 = Int(5);
+			Int tmp_2 = Int(5);
+			Int tmp_3 = tmp_1->PLUS(tmp_2);
+			tmp_3;`},
+		{
+			src: `10 < 4;`,
+			res: `
+			Int tmp_1 = Int(10);
+			Int tmp_2 = Int(4);
+			Bool tmp_3 = tmp_1->LESS(tmp_2);
+			tmp_3;`}}
 
 	for i, test := range tests {
-		l := lexer.NewLexer([]byte(input))
+		l := lexer.NewLexer([]byte(test.src))
 		p := parser.NewParser()
 		res, err := p.Parse(l)
 		if err != nil {
-			return t.Log(err)
+			t.Log(err)
 		}
 
 		program, _ := res.(*ast.Program)
-		env, err = checker.Checker(program)
+		_, err = checker.Checker(program)
 		if err != nil {
-			return t.Log(err)
+			t.Log(err)
 		}
 
 		var b bytes.Buffer
-		code, err := gen.Gen(program, &b, env)
+		code := gen.Gen(program, &b)
 		if err != nil {
 			t.Log(err)
 		}
@@ -43,16 +58,15 @@ func TestGen(t *testing.T) {
 
 		// remove spaces for comparison
 		for _, rep := range []string{" ", "\n", "\t"} {
-			code = strings.Replace(code, rep, "", -1)
+			codeString = strings.Replace(codeString, rep, "", -1)
 			test.res = strings.Replace(test.res, rep, "", -1)
 		}
 
-		if code != test.res {
-			t.Fatalf("test [%d] failed at character", i)
+		if codeString != test.res {
+			t.Log(codeString)
+			t.Fatalf("test [%d] failed", i)
 		}
-
 	}
-
 }
 
 func TestOutPut(T *testing.T) {

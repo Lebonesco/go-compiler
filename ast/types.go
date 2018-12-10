@@ -104,6 +104,7 @@ type StringLiteral struct {
 
 type InfixExpression struct {
 	Token    *token.Token `json:"-"`
+	Type     string       `json:"-"`
 	Left     Expression   `json:"left"`
 	Right    Expression   `json:"right"`
 	Operator string       `json:"operator"`

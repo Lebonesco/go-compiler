@@ -7,7 +7,7 @@ import (
 )
 
 func Checker(program *ast.Program) (Environment, error) {
-	env := NewEnvironment()
+	env = NewEnvironment() // reset environment
 	_, err := checker(program, &env)
 	return env, err
 }
@@ -175,8 +175,12 @@ func evalInfixExpression(node *ast.InfixExpression, env *Environment) (string, e
 		return "", errors.New("incorrect types for operation")
 	}
 
-	if !MethodExist(left, node.Operator) {
-		return NOTHING_TYPE, errors.New(fmt.Sprintf("method %s not exist for type %s", node.Operator, left))
+	node.Type = left // set type for code generation
+
+	methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUAL, "<": LT, ">": GT, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
+
+	if !MethodExist(left, methods[node.Operator]) {
+		return NOTHING_TYPE, errors.New(fmt.Sprintf("method %s not exist for type %s", methods[node.Operator], left))
 	}
 
 	for _, opr := range []string{"<=", "<", ">=", ">", "or", "and"} {

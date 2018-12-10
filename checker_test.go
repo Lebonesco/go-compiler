@@ -19,7 +19,7 @@ func TestOperations(t *testing.T) {
 		{`5 + "5";`, false},
 		{`5 * 5;`, true},
 		{`5 * 5 + 9;`, true},
-		{`5 <= 10;`, true},
+		{`5 < 10;`, true},
 		{`true and true;`, true},
 		{`4 and 2;`, false},
 		{`true or false;`, true}}
