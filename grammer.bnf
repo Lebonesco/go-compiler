@@ -7,7 +7,7 @@ _letter : 'A'-'Z' | 'a'-'z' | '_' ;
 _digit : '0'-'9' ;
 _alpha : _letter | _digit ;
 
-string_literal : '"' {_alpha} '"' ;
+string_literal : '"' {_alpha | ' ' | '!' | '?' }'"' ;
 int : '0' | '1'-'9' {_digit} ;
 
 /* keywords */
