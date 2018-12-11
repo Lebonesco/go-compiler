@@ -111,7 +111,9 @@ type InfixExpression struct {
 }
 
 type FunctionCall struct {
-	Token *token.Token `json:"-"`
-	Name  string       `json:"name"`
-	Args  []Expression `json:"args"`
+	Token   *token.Token `json:"-"`
+	Name    string       `json:"name"`
+	Args    []Expression `json:"args"`
+	Builtin bool         `json:"builtin"`
+	Type    string       `json:"type"`
 }

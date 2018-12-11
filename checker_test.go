@@ -40,6 +40,10 @@ func TestIdents(t *testing.T) {
 			`let y = "hey";
 			y = "cool";`, true},
 		{
+			`let x = "hello ";
+			let y = "world";
+			let z = x + y;`, true},
+		{
 			`x = 5;`, false}}
 
 	runTests(tests, t)

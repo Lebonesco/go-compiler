@@ -32,7 +32,21 @@ func TestGen(t *testing.T) {
 			Int tmp_1 = Int(10);
 			Int tmp_2 = Int(4);
 			Bool tmp_3 = tmp_1->LESS(tmp_2);
-			tmp_3;`}}
+			tmp_3;`},
+		{
+			src: `
+				let x = "hello ";
+				let y = "world!";
+				let z = x + y;
+				`,
+			res: `
+				String tmp_1 = String("hello ");
+				x = tmp_1;
+				String tmp_2 = String("world!");
+				y = tmp_2;
+				String tmp_3 = ->PLUS();
+				z = tmp_3;
+				`}}
 
 	for i, test := range tests {
 		l := lexer.NewLexer([]byte(test.src))

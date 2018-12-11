@@ -12,17 +12,17 @@ func TestParser(t *testing.T) {
 			let five = "test";
 			let ten = 10;
 
-			func add() {
+			func add() Int {
 				return x + y;
-			};
+			}
 
 			let result = 4;  
 			5 < 10;
 
 			if (5 < 10) {
-				print();
+				print(10);
 			} else {
-				print();
+				print(5);
 			}
 
 			10 == 10;

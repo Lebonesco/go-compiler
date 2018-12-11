@@ -108,7 +108,7 @@ func NewBlockStatement(stmts Attrib) (*BlockStatement, error) {
 	return &BlockStatement{Statements: s}, nil
 }
 
-func NewFunctionStatement(name, args, block Attrib) (Statement, error) {
+func NewFunctionStatement(name, args, ret, block Attrib) (Statement, error) {
 	n, ok := name.(*token.Token)
 	if !ok {
 		return nil, Error("NewFunctionStatement", "*token.Token", "name", name)
@@ -127,7 +127,12 @@ func NewFunctionStatement(name, args, block Attrib) (Statement, error) {
 		}
 	}
 
-	return &FunctionStatement{Name: string(n.Lit), Body: b, Parameters: a}, nil
+	r, ok := ret.(*token.Token)
+	if !ok {
+		// bad
+	}
+
+	return &FunctionStatement{Name: string(n.Lit), Body: b, Parameters: a, Return: string(r.Lit)}, nil
 }
 
 func NewIfStatement(cond, cons, alt Attrib) (Statement, error) {
@@ -152,6 +157,7 @@ func NewIfStatement(cond, cons, alt Attrib) (Statement, error) {
 func NewInfixExpression(left, right, oper Attrib) (Expression, error) {
 	l, ok := left.(Expression)
 	if !ok {
+		fmt.Println(left)
 		return nil, Error("NewInfixExpression", "Expression", "left", left)
 	}
 
@@ -228,7 +234,7 @@ func NewFormalArg() ([]FormalArg, error) {
 	return []FormalArg{}, nil
 }
 
-func AppendFormalArgs(args, kind, arg Attrib) ([]FormalArg, error) {
+func AppendFormalArgs(args, arg, kind Attrib) ([]FormalArg, error) {
 	as, ok := args.([]FormalArg)
 	if !ok {
 		return nil, Error("AppendFormalArgs", "[]FormalArg", "args", args)

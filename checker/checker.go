@@ -29,6 +29,8 @@ func checker(node ast.Node, env *Environment) (string, error) {
 		return evalAssignStatement(node, env)
 	case *ast.InitStatement:
 		return evalInitStatement(node, env)
+	case *ast.FunctionStatement:
+		return evalFunctionStatement(node, env)
 	// Expressions
 	case *ast.InfixExpression:
 		return evalInfixExpression(node, env)
@@ -92,7 +94,7 @@ func evalInitStatement(node *ast.InitStatement, env *Environment) (string, error
 
 	right, err := checker(node.Expr, env)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	env.Set(node.Location, right) // set ident type
@@ -115,12 +117,24 @@ func evalAssignStatement(node *ast.AssignStatement, env *Environment) (string, e
 	return "", nil
 }
 
+func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (string, error) {
+	// check correct return statement
+	// store in environment
+	var params []string
+	for _, param := range node.Parameters {
+		params = append(params, param.Type)
+	}
+
+	SetFunctionSignature(node.Name, Signature{node.Return, params}) // can place be value
+	return "", nil
+}
+
 // Expressions
 
 func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) {
 	var sig Signature
 	var ok bool
-	if sig, ok = env.GetFunctionSignature(node.Name); !ok {
+	if sig, ok = GetFunctionSignature(node.Name); !ok {
 		return "", errors.New("function not exist")
 	}
 
@@ -132,7 +146,7 @@ func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) 
 	for i, arg := range node.Args {
 		res, err := checker(arg, env)
 		if err != nil {
-			return "", nil
+			return "", errors.New(err.Error())
 		}
 
 		if res != sig.Params[i] {

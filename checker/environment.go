@@ -95,8 +95,12 @@ func (e *Environment) Set(name, kind string) {
 	e.Vals[name] = kind
 }
 
-func (e *Environment) GetFunctionSignature(name string) (Signature, bool) {
-	kind, ok := e.Funcs[name]
+func SetFunctionSignature(name string, sig Signature) {
+	env.Funcs[name] = sig
+}
+
+func GetFunctionSignature(name string) (Signature, bool) {
+	kind, ok := env.Funcs[name]
 	return kind, ok
 }
 
