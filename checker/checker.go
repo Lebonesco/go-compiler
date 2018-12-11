@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Lebonesco/go-compiler/ast"
+	"reflect"
 )
 
 func Checker(program *ast.Program) (Environment, error) {
@@ -61,12 +62,15 @@ func evalProgram(p *ast.Program, env *Environment) (string, error) {
 // Statements
 func evalBlockStatement(node *ast.BlockStatement, env *Environment) (string, error) {
 	for _, statement := range node.Statements {
-		_, err := checker(statement, env)
+		result, err := checker(statement, env)
 		if err != nil {
 			return "", err
 		}
+		if reflect.TypeOf(statement) == reflect.TypeOf(&ast.ReturnStatement{}) {
+			return result, nil
+		}
 	}
-	return "", nil
+	return NOTHING_TYPE, nil
 }
 
 func evalReturnStatement(node *ast.ReturnStatement, env *Environment) (string, error) {
@@ -122,7 +126,18 @@ func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (strin
 	// store in environment
 	var params []string
 	for _, param := range node.Parameters {
+		env.Set(param.Arg, param.Type) // set params into scope
 		params = append(params, param.Type)
+	}
+
+	res, err := checker(node.Body, env)
+	if err != nil {
+		return "", err
+	}
+
+	// check if correct return type
+	if res != node.Return {
+		return "", errors.New("incorrect return type")
 	}
 
 	SetFunctionSignature(node.Name, Signature{node.Return, params}) // can place be value

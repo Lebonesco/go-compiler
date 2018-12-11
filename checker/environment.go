@@ -114,6 +114,11 @@ func (e *Environment) IdentExist(kind string) bool {
 	return ok
 }
 
+func GetIdentType(name string) (string, bool) {
+	kind, ok := env.Vals[name]
+	return kind, ok
+}
+
 func (e *Environment) TypeExist(kind string) bool {
 	_, ok := e.Types[kind]
 	return ok
