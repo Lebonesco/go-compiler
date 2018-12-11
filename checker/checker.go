@@ -122,8 +122,6 @@ func evalAssignStatement(node *ast.AssignStatement, env *Environment) (string, e
 }
 
 func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (string, error) {
-	// check correct return statement
-	// store in environment
 	var params []string
 	for _, param := range node.Parameters {
 		env.Set(param.Arg, param.Type) // set params into scope
@@ -134,13 +132,12 @@ func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (strin
 	if err != nil {
 		return "", err
 	}
-
 	// check if correct return type
 	if res != node.Return {
 		return "", errors.New("incorrect return type")
 	}
 
-	SetFunctionSignature(node.Name, Signature{node.Return, params}) // can place be value
+	SetFunctionSignature(node.Name, Signature{node.Return, params})
 	return "", nil
 }
 

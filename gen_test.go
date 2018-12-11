@@ -41,12 +41,28 @@ func TestGen(t *testing.T) {
 				`,
 			res: `
 				String tmp_1 = String("hello ");
-				x = tmp_1;
+				String x = tmp_1;
 				String tmp_2 = String("world!");
-				y = tmp_2;
-				String tmp_3 = ->PLUS();
-				z = tmp_3;
-				`}}
+				String y = tmp_2;
+				String tmp_3 = x->PLUS(y);
+				String z = tmp_3;
+				`},
+		{
+			src: `
+				func add(x Int, y Int) Int {
+					return x + y;
+				}
+
+				let a = add(1, 3);`,
+			res: `
+				Int add(Int y, Int x) {
+					Int tmp_1 = x->PLUS(y);
+					return tmp_1;
+				}
+				Int tmp_2 = Int(3);
+				Int tmp_3 = Int(1);
+				Int tmp_4 = add(tmp_2, tmp_3);
+				Int a = tmp_4;`}}
 
 	for i, test := range tests {
 		l := lexer.NewLexer([]byte(test.src))

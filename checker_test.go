@@ -56,13 +56,17 @@ func TestFunctions(t *testing.T) {
 				return x + y;
 			}
 
-			let x = add(1, 3);`, true},
+			let a = add(1, 3);`, true},
 		{
 			`func add(x Int, y Int) Int {
 				return x + y;
 			}
 
-			let x = add("test", 3);`, false},
+			let z = add("test", 3);`, false},
+		{
+			`func one() Int {
+				return "test";
+			}`, false},
 	}
 
 	runTests(tests, t)
