@@ -50,6 +50,13 @@ func checker(node ast.Node, env *Environment) (string, error) {
 }
 
 func evalProgram(p *ast.Program, env *Environment) (string, error) {
+	for _, function := range p.Functions {
+		_, err := checker(function, env)
+		if err != nil {
+			return "", err
+		}
+	}
+
 	for _, statement := range p.Statements {
 		_, err := checker(statement, env)
 		if err != nil {
@@ -144,6 +151,15 @@ func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (strin
 // Expressions
 
 func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) {
+	if IsBuiltin(node.Name) {
+		res, err := checker(node.Args[0], env)
+		if err != nil {
+			return "", err
+		}
+		node.Type = res
+		return NOTHING_TYPE, nil
+	}
+
 	var sig Signature
 	var ok bool
 	if sig, ok = GetFunctionSignature(node.Name); !ok {

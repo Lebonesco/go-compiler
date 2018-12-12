@@ -9,12 +9,12 @@ import (
 func TestParser(t *testing.T) {
 	const input = `
 			/* comment should not be scanned */
-			let five = "test";
-			let ten = 10;
-
 			func add() Int {
 				return x + y;
 			}
+
+			let five = "test";
+			let ten = 10;
 
 			let result = 4;  
 			5 < 10;

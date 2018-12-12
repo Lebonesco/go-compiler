@@ -8,6 +8,7 @@ type Attrib interface{}
 // root node
 type Program struct {
 	Statements []Statement `json:"statements"`
+	Functions  []Statement `json:"functions"`
 }
 
 // base interface
@@ -111,9 +112,8 @@ type InfixExpression struct {
 }
 
 type FunctionCall struct {
-	Token   *token.Token `json:"-"`
-	Name    string       `json:"name"`
-	Args    []Expression `json:"args"`
-	Builtin bool         `json:"builtin"`
-	Type    string       `json:"type"`
+	Token *token.Token `json:"-"`
+	Name  string       `json:"name"`
+	Args  []Expression `json:"args"`
+	Type  string       `json:"type"`
 }

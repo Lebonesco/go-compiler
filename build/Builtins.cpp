@@ -5,14 +5,45 @@
 
 using namespace std;
 
+
+// Nothing Class
+class Nothing {
+	
+};
+
 // Base Class
 class Base {
 public:
-	string val
-	void Print(void) {
+	string val;
+	Nothing PRINT(void) {
 		cout << val << endl;
 	}
-}
+};
+
+const string True = "true";
+const string False = "false";
+
+// Bool Class
+class Bool: public Base {
+public:
+	Bool(string x) {
+		val = x;
+	}
+
+	Bool And(Bool x) {
+		if (val == False || x.val == False) {
+			return Bool(False);
+		}
+		return Bool(False);
+	}
+
+	Bool Or(Bool x) {
+		if (val == True || x.val == True) {
+			return Bool(True);
+		}
+		return Bool(False);
+	}
+};
 
 // String Class
 class String: public Base {
@@ -20,62 +51,56 @@ public:
 	String(string x) {
 		val = x;
 	}
-	String Add(String str) {
+	String PLUS(String str) {
 		return String(val + str.val);
 	}
-}
 
+	Bool EQ(String str) {
+		if (val == str.val) {
+			return Bool(True);
+		} else {
+			return Bool(False);
+		}
+	}
+};
 
 // Int Class
 class Int: public Base {
 public:
-	Int(string x) {
-		val = x;
+	int valInt;
+	Int(int x) {
+		val = to_string(x);
+		valInt = x;
 	}
 
-	Int Add(Add num) {
-		return Int(val = num.val);
+	Int PLUS(Int num) {
+		return Int(valInt + num.valInt);
 	}
 
-	Int Sub(Add num) {
-		return Int(val - num.val);
+	Int Sub(Int num) {
+		return Int(valInt - num.valInt);
 	}
 
-	Int Mul(Add num) {
-		return Int(val * num.val);
+	Int Mul(Int num) {
+		return Int(valInt * num.valInt);
 	}
 
-	Bool GT(Add num) {
-		return Bool(val < num.val);
-	}
-
-	Int EQ(Add num) {
-		return Bool(val == num.val);
-	}
-
-	String String() {
-		return String(val);
-	}
-}
-
-const True = "true";
-const False = "false";
-
-// Bool Class
-class Bool: public Base {
-public:
-
-	Bool And(Bool x) {
-		if val == False || x.val == False {
+	Bool GT(Int num) {
+		if (valInt < num.valInt) {
 			return Bool(False);
+		} else {
+			return Bool(True);
 		}
-		return Bool(True);
 	}
 
-	Bool Or(Bool x) {
-		if val == True or x.val == True {
+	Bool EQ(Int num) {
+		if (valInt == num.valInt) {
 			return Bool(True);
 		}
 		return Bool(False);
 	}
-}
+
+	String Stringify() {
+		return String(val);
+	}
+};

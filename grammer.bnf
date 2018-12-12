@@ -53,9 +53,18 @@ import (
 >>
 
 Program
-  : Statements  << ast.NewProgram($0) >>
+  : Functions Statements  << ast.NewProgram($0, $1) >>
   ;
- 
+
+Functions
+  : Functions Function << ast.AppendStatement($0, $1) >>
+  | empty     << ast.NewStatementList() >>
+  ;
+
+Function
+  : func ident lparen FormalArgs rparen ident StatementBlock << ast.NewFunctionStatement($1, $3, $5, $6) >>
+  ;
+
  Statements
   : Statements Statement << ast.AppendStatement($0, $1) >>
   | empty << ast.NewStatementList() >>
@@ -69,7 +78,6 @@ Program
   : if Expression StatementBlock IfStatement << ast.NewIfStatement($1, $2, $3) >>
   | ident assign Expression semicolon << ast.NewAssignStatement($0, $2) >>
   | let ident assign Expression semicolon << ast.NewIdentInit($1, $3) >>
-  | func ident lparen FormalArgs rparen ident StatementBlock << ast.NewFunctionStatement($1, $3, $5, $6) >>
   | Expression semicolon << ast.NewExpressionStatement($0) >>
   | return Expression semicolon << ast.NewReturnStatement($1) >>
   ;

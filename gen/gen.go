@@ -26,19 +26,10 @@ func freshTemp() string {
 }
 
 func GenWrapper(p *ast.Program) bytes.Buffer {
-	var b bytes.Buffer
-
-	write(&b, "include <string>\ninclude <iostream>\n\n")
-	write(&b, "int main() {\n")
-	Gen(p, &b)
-	write(&b, "return 0;\n}")
-	return b
-}
-
-func Gen(p *ast.Program, b *bytes.Buffer) bytes.Buffer {
 	TMP_COUNT = 0
-	gen(p, b)
-	return *b
+	var b bytes.Buffer
+	gen(p, &b)
+	return b
 }
 
 func gen(node ast.Node, b *bytes.Buffer) string {
@@ -78,9 +69,17 @@ func gen(node ast.Node, b *bytes.Buffer) string {
 }
 
 func genProgram(node *ast.Program, b *bytes.Buffer) string {
+	write(b, "#include <string>\n#include <iostream>\n#include \"Builtins.cpp\"\n\n")
+
+	for _, funcs := range node.Functions {
+		gen(funcs, b)
+	}
+
+	write(b, "int main() {\n")
 	for _, stmt := range node.Statements {
 		gen(stmt, b)
 	}
+	write(b, "return 0;\n}")
 	return ""
 }
 
@@ -118,6 +117,10 @@ func genReturnStatement(node *ast.ReturnStatement, b *bytes.Buffer) string {
 }
 
 func genFunctionStatement(node *ast.FunctionStatement, b *bytes.Buffer) string {
+	if IsBuiltin(node.Name) {
+		panic("built in function")
+	}
+
 	write(b, "%s %s(", node.Return, node.Name)
 
 	for i, arg := range node.Parameters {
@@ -134,7 +137,7 @@ func genFunctionStatement(node *ast.FunctionStatement, b *bytes.Buffer) string {
 
 func genIfStatement(node *ast.IfStatement, b *bytes.Buffer) string {
 	cond := gen(node.Condition, b)
-	write(b, "if (\"true\" == %s->val) {\n", cond)
+	write(b, "if (\"true\" == %s.val) {\n", cond)
 	gen(node.Block, b)
 	write(b, "} else {\n")
 	gen(node.Alternative, b)
@@ -159,9 +162,9 @@ func genString(node *ast.StringLiteral, b *bytes.Buffer) string {
 
 func genBoolean(node *ast.Boolean, b *bytes.Buffer) string {
 	if node.Value {
-		return "Bool(true)"
+		return "Bool(\"true\")"
 	} else {
-		return "Bool(false)"
+		return "Bool(\"false\")"
 	}
 	return ""
 }
@@ -179,7 +182,7 @@ func genInfixExpression(node *ast.InfixExpression, b *bytes.Buffer) string {
 	methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUAL, "<": LT, ">": GT, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
 
 	method, _ := GetMethod(kind, methods[node.Operator])
-	write(b, "%s %s = %s->%s(%s);\n", method.Return, tmp, left, methods[node.Operator], right)
+	write(b, "%s %s = %s.%s(%s);\n", method.Return, tmp, left, methods[node.Operator], right)
 	return tmp
 }
 
@@ -193,18 +196,21 @@ func genFunctionCall(node *ast.FunctionCall, b *bytes.Buffer) string {
 	}
 
 	tmp := freshTemp()
-	if node.Builtin {
-		sig, _ = GetMethod(node.Type, node.Name)
-		write(b, "%s %s = %s->%s(", sig.Return, tmp, node.Type, node.Name)
+	if IsBuiltin(node.Name) {
+		sig, ok := GetMethod(node.Type, node.Name)
+		if !ok {
+			panic("no builtin function")
+		}
+
+		write(b, "%s %s = %s.%s(", sig.Return, tmp, args[0], node.Name)
 	} else {
 		sig, _ = GetFunctionSignature(node.Name)
 		write(b, "%s %s = %s(", sig.Return, tmp, node.Name)
-	}
-
-	for i, arg := range args {
-		write(b, arg)
-		if i != len(args)-1 {
-			write(b, ",")
+		for i, arg := range args {
+			write(b, arg)
+			if i != len(args)-1 {
+				write(b, ",")
+			}
 		}
 	}
 

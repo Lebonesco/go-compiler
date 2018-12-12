@@ -56,13 +56,18 @@ func Error(fun, expected, v string, got interface{}) error {
 
 // AST Constructors
 
-func NewProgram(stmts Attrib) (*Program, error) {
+func NewProgram(funcs, stmts Attrib) (*Program, error) {
 	s, ok := stmts.([]Statement)
 	if !ok {
 		return nil, Error("NewProgram", "[]Statement", "stmts", stmts)
 	}
 
-	return &Program{Statements: s}, nil
+	f, ok := funcs.([]Statement)
+	if !ok {
+		return nil, Error("NewProgram", "[]Statement", "funcs", funcs)
+	}
+
+	return &Program{Functions: f, Statements: s}, nil
 }
 
 func NewStatementList() ([]Statement, error) {
