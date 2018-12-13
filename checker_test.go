@@ -95,7 +95,7 @@ func stringToChecker(input string) error {
 	}
 
 	program, _ := res.(*ast.Program)
-	_, err = checker.Checker(program)
+	err = checker.Checker(program)
 	if err != nil {
 		return err
 	}

@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Lebonesco/go-compiler/ast"
-	"github.com/Lebonesco/go-compiler/lexer"
-	"github.com/Lebonesco/go-compiler/parser"
 	"reflect"
 	"testing"
 )
@@ -48,17 +46,8 @@ func TestAST(t *testing.T) {
 				Alternative: &ast.BlockStatement{Statements: []ast.Statement{ast.ExpressionStatement{Expression: ast.FunctionCall{Name: "print", Args: []ast.Expression{}}}}}},
 			ast.ExpressionStatement{Expression: ast.InfixExpression{Left: ast.IntegerLiteral{Value: "10"}, Operator: "==", Right: ast.IntegerLiteral{Value: "10"}}}}}
 
-	l := lexer.NewLexer([]byte(input))
-	p := parser.NewParser()
-	res, err := p.Parse(l)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	program := Parse(input)
 
-	program, ok := res.(*ast.Program)
-	if !ok {
-		t.Fatalf("res not *ast.Program, got=%T", res)
-	}
 	js, _ := json.MarshalIndent(program, "", "    ")
 	jsOut, _ := json.MarshalIndent(out, "", "    ")
 
@@ -66,16 +55,6 @@ func TestAST(t *testing.T) {
 		fmt.Printf("\n%s\n", js)
 		fmt.Println("****************************")
 		fmt.Printf("\n%s\n", jsOut)
-
-		str1 := string(js)
-		str2 := string(jsOut)
-
-		for i := 1; i <= len(str1); i++ {
-			if str1[i] != str2[i] {
-				fmt.Println(str1[1:i], str2[1:i], i)
-				break
-			}
-		}
 
 		t.Fatalf("Wrong AST")
 	}

@@ -1,14 +1,7 @@
 package main
 
 import (
-	"bytes"
-	"github.com/Lebonesco/go-compiler/ast"
-	"github.com/Lebonesco/go-compiler/checker"
 	"github.com/Lebonesco/go-compiler/gen"
-	"github.com/Lebonesco/go-compiler/lexer"
-	"github.com/Lebonesco/go-compiler/parser"
-	"os"
-	"os/exec"
 	"strings"
 	"testing"
 )
@@ -123,26 +116,10 @@ func TestGen(t *testing.T) {
 				}`}}
 
 	for i, test := range tests {
-		l := lexer.NewLexer([]byte(test.src))
-		p := parser.NewParser()
-		res, err := p.Parse(l)
-		if err != nil {
-			t.Log(err)
-		}
-
-		program, _ := res.(*ast.Program)
-		_, err = checker.Checker(program)
-		if err != nil {
-			t.Log(err)
-		}
-
+		program := Parse(test.src)
+		TypeCheck(program)
 		code := gen.GenWrapper(program)
-		if err != nil {
-			t.Log(err)
-		}
-
 		codeString := code.String()
-
 		// remove spaces for comparison
 		for _, rep := range []string{" ", "\n", "\t"} {
 			codeString = strings.Replace(codeString, rep, "", -1)
@@ -197,47 +174,11 @@ func TestOutPut(t *testing.T) {
 			out: ""}}
 
 	for i, test := range tests {
-		l := lexer.NewLexer([]byte(test.src))
-		p := parser.NewParser()
-		res, err := p.Parse(l)
-		if err != nil {
-			t.Log(err)
-		}
-
-		program, _ := res.(*ast.Program)
-		_, err = checker.Checker(program)
-		if err != nil {
-			t.Log(err)
-		}
-
+		program := Parse(test.src)
+		TypeCheck(program)
 		code := gen.GenWrapper(program)
-		if err != nil {
-			t.Log(err)
-		}
+		output := Compile(code)
 
-		f, err := os.Create("./build/" + "main" + ".cpp")
-		defer f.Close()
-		f.Write(code.Bytes())
-
-		var out bytes.Buffer
-		cmd1 := exec.Command("g++", "-o", "main", "./build/"+"main"+".cpp", "./build/Builtins.cpp")
-		cmd1.Stderr = &out
-		err = cmd1.Run()
-		if len(out.String()) != 0 {
-			t.Log(code.String())
-			t.Fatalf("error: %s", out.String())
-		}
-
-		cmd := exec.Command("./main.exe")
-		var outb bytes.Buffer
-		cmd.Stdout = &outb
-		err = cmd.Run()
-
-		if err != nil {
-			t.Fatalf(err.Error())
-		}
-
-		output := outb.String()
 		for _, rep := range []string{" ", "\n", "\t"} {
 			output = strings.Replace(output, rep, "", -1)
 		}

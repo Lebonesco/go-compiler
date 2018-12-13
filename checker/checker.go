@@ -7,58 +7,58 @@ import (
 	"reflect"
 )
 
-func Checker(program *ast.Program) (Environment, error) {
+func Checker(program *ast.Program) error {
 	env = NewEnvironment() // reset environment
-	_, err := checker(program, &env)
-	return env, err
+	_, err := checker(program)
+	return err
 }
 
-func checker(node ast.Node, env *Environment) (string, error) {
+func checker(node ast.Node) (string, error) {
 	switch node := node.(type) {
 	// Statements
 	case *ast.Program:
-		return evalProgram(node, env)
+		return evalProgram(node)
 	case *ast.BlockStatement:
-		return evalBlockStatement(node, env)
+		return evalBlockStatement(node)
 	case *ast.ReturnStatement:
-		return evalReturnStatement(node, env)
+		return evalReturnStatement(node)
 	case *ast.IfStatement:
-		return evalIfStatement(node, env)
+		return evalIfStatement(node)
 	case *ast.ExpressionStatement:
-		return evalExpressionStatement(node, env)
+		return evalExpressionStatement(node)
 	case *ast.AssignStatement:
-		return evalAssignStatement(node, env)
+		return evalAssignStatement(node)
 	case *ast.InitStatement:
-		return evalInitStatement(node, env)
+		return evalInitStatement(node)
 	case *ast.FunctionStatement:
-		return evalFunctionStatement(node, env)
+		return evalFunctionStatement(node)
 	// Expressions
 	case *ast.InfixExpression:
-		return evalInfixExpression(node, env)
+		return evalInfixExpression(node)
 	case *ast.IntegerLiteral:
-		return evalInteger(node, env)
+		return evalInteger(node)
 	case *ast.StringLiteral:
-		return evalString(node, env)
+		return evalString(node)
 	case *ast.Boolean:
-		return evalBoolean(node, env)
+		return evalBoolean(node)
 	case *ast.Identifier:
-		return evalIdentifier(node, env)
+		return evalIdentifier(node)
 	case *ast.FunctionCall:
-		return evalFunctionCall(node, env)
+		return evalFunctionCall(node)
 	}
 	return "", nil
 }
 
-func evalProgram(p *ast.Program, env *Environment) (string, error) {
+func evalProgram(p *ast.Program) (string, error) {
 	for _, function := range p.Functions {
-		_, err := checker(function, env)
+		_, err := checker(function)
 		if err != nil {
 			return "", err
 		}
 	}
 
 	for _, statement := range p.Statements {
-		_, err := checker(statement, env)
+		_, err := checker(statement)
 		if err != nil {
 			return "", err
 		}
@@ -67,9 +67,9 @@ func evalProgram(p *ast.Program, env *Environment) (string, error) {
 }
 
 // Statements
-func evalBlockStatement(node *ast.BlockStatement, env *Environment) (string, error) {
+func evalBlockStatement(node *ast.BlockStatement) (string, error) {
 	for _, statement := range node.Statements {
-		result, err := checker(statement, env)
+		result, err := checker(statement)
 		if err != nil {
 			return "", err
 		}
@@ -80,17 +80,24 @@ func evalBlockStatement(node *ast.BlockStatement, env *Environment) (string, err
 	return NOTHING_TYPE, nil
 }
 
-func evalReturnStatement(node *ast.ReturnStatement, env *Environment) (string, error) {
-	res, err := checker(node.ReturnValue, env)
+func evalReturnStatement(node *ast.ReturnStatement) (string, error) {
+	res, err := checker(node.ReturnValue)
 	return res, err
 }
 
-func evalIfStatement(node *ast.IfStatement, env *Environment) (string, error) {
+func evalIfStatement(node *ast.IfStatement) (string, error) {
+	cond, _ := checker(node.Condition)
+	if cond != BOOL_TYPE {
+		return "", errors.New("condition not bool type")
+	}
+
+	checker(node.Block)
+	checker(node.Alternative)
 	return "", nil
 }
 
-func evalExpressionStatement(node *ast.ExpressionStatement, env *Environment) (string, error) {
-	_, err := checker(node.Expression, env)
+func evalExpressionStatement(node *ast.ExpressionStatement) (string, error) {
+	_, err := checker(node.Expression)
 	if err != nil {
 		return "", err
 	}
@@ -98,12 +105,12 @@ func evalExpressionStatement(node *ast.ExpressionStatement, env *Environment) (s
 	return "", nil
 }
 
-func evalInitStatement(node *ast.InitStatement, env *Environment) (string, error) {
+func evalInitStatement(node *ast.InitStatement) (string, error) {
 	if env.IdentExist(node.Location) {
 		return "", errors.New("ident already exist")
 	}
 
-	right, err := checker(node.Expr, env)
+	right, err := checker(node.Expr)
 	if err != nil {
 		return "", err
 	}
@@ -112,8 +119,8 @@ func evalInitStatement(node *ast.InitStatement, env *Environment) (string, error
 	return "", nil
 }
 
-func evalAssignStatement(node *ast.AssignStatement, env *Environment) (string, error) {
-	right, err := checker(node.Right, env)
+func evalAssignStatement(node *ast.AssignStatement) (string, error) {
+	right, err := checker(node.Right)
 	if err != nil {
 		return "", nil
 	}
@@ -128,14 +135,14 @@ func evalAssignStatement(node *ast.AssignStatement, env *Environment) (string, e
 	return "", nil
 }
 
-func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (string, error) {
+func evalFunctionStatement(node *ast.FunctionStatement) (string, error) {
 	var params []string
 	for _, param := range node.Parameters {
 		env.Set(param.Arg, param.Type) // set params into scope
 		params = append(params, param.Type)
 	}
 
-	res, err := checker(node.Body, env)
+	res, err := checker(node.Body)
 	if err != nil {
 		return "", err
 	}
@@ -150,9 +157,9 @@ func evalFunctionStatement(node *ast.FunctionStatement, env *Environment) (strin
 
 // Expressions
 
-func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) {
+func evalFunctionCall(node *ast.FunctionCall) (string, error) {
 	if IsBuiltin(node.Name) {
-		res, err := checker(node.Args[0], env)
+		res, err := checker(node.Args[0])
 		if err != nil {
 			return "", err
 		}
@@ -172,7 +179,7 @@ func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) 
 
 	// check params
 	for i, arg := range node.Args {
-		res, err := checker(arg, env)
+		res, err := checker(arg)
 		if err != nil {
 			return "", errors.New(err.Error())
 		}
@@ -185,30 +192,30 @@ func evalFunctionCall(node *ast.FunctionCall, env *Environment) (string, error) 
 	return sig.Return, nil
 }
 
-func evalIdentifier(node *ast.Identifier, env *Environment) (string, error) {
+func evalIdentifier(node *ast.Identifier) (string, error) {
 	kind, _ := env.Get(node.Value)
 	return kind, nil
 }
 
-func evalBoolean(node *ast.Boolean, env *Environment) (string, error) {
+func evalBoolean(node *ast.Boolean) (string, error) {
 	return BOOL_TYPE, nil
 }
 
-func evalInteger(node *ast.IntegerLiteral, env *Environment) (string, error) {
+func evalInteger(node *ast.IntegerLiteral) (string, error) {
 	return INT_TYPE, nil
 }
 
-func evalString(node *ast.StringLiteral, env *Environment) (string, error) {
+func evalString(node *ast.StringLiteral) (string, error) {
 	return STRING_TYPE, nil
 }
 
-func evalInfixExpression(node *ast.InfixExpression, env *Environment) (string, error) {
-	left, err := checker(node.Left, env)
+func evalInfixExpression(node *ast.InfixExpression) (string, error) {
+	left, err := checker(node.Left)
 	if err != nil {
 		return left, err
 	}
 
-	right, err := checker(node.Right, env)
+	right, err := checker(node.Right)
 	if err != nil {
 		return right, err
 	}

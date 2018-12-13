@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/Lebonesco/go-compiler/lexer"
-	"github.com/Lebonesco/go-compiler/parser"
 	"testing"
 )
 
@@ -28,10 +26,5 @@ func TestParser(t *testing.T) {
 			10 == 10;
 			`
 
-	l := lexer.NewLexer([]byte(input))
-	p := parser.NewParser()
-	_, err := p.Parse(l)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	Parse(input)
 }

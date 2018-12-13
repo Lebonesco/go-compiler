@@ -1,9 +1,11 @@
-func test(x int) int {
-	var y int;
-	if x > 5 {
+func test(x Int) Int {
+	let y = 0;
+	if y > 5 {
 		y = 5;
 	} else {
 		y = 8;
 	}
 	return y;
 }
+
+PRINT(test(5));

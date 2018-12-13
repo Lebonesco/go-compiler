@@ -77,11 +77,11 @@ public:
 		return Int(valInt + num.valInt);
 	}
 
-	Int Sub(Int num) {
+	Int MINUS(Int num) {
 		return Int(valInt - num.valInt);
 	}
 
-	Int Mul(Int num) {
+	Int TIMES(Int num) {
 		return Int(valInt * num.valInt);
 	}
 

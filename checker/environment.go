@@ -3,9 +3,9 @@ package checker
 // operations
 const (
 	PLUS   = "PLUS"
-	EQUAL  = "EQUAL"
-	LT     = "LESS"
-	GT     = "MORE"
+	EQUAL  = "EQ"
+	LT     = "LT"
+	GT     = "GT"
 	MINUS  = "MINUS"
 	DIVIDE = "DIVIDE"
 	TIMES  = "TIMES"
@@ -48,8 +48,8 @@ var TypeTable = map[string]Methods{
 		MINUS: {INT_TYPE, []string{INT_TYPE}},
 		TIMES: {INT_TYPE, []string{INT_TYPE}},
 		LT:    {BOOL_TYPE, []string{INT_TYPE}},
-		GT:    {INT_TYPE, []string{INT_TYPE}},
-		EQUAL: {INT_TYPE, []string{INT_TYPE}},
+		GT:    {BOOL_TYPE, []string{INT_TYPE}},
+		EQUAL: {BOOL_TYPE, []string{INT_TYPE}},
 		PRINT: {NOTHING_TYPE, []string{}}},
 	STRING_TYPE: {
 		PLUS:  {STRING_TYPE, []string{STRING_TYPE}},
@@ -66,6 +66,10 @@ type Environment struct {
 }
 
 var env Environment // set global
+
+func IsBuiltin(name string) bool {
+	return name == "PRINT"
+}
 
 func NewEnvironment() Environment {
 	return Environment{Vals: map[string]string{}, Funcs: map[string]Signature{}, Types: map[string]bool{}}

@@ -1,21 +1,12 @@
-func add(a int, b int) int {
+func add(a Int, b Int) Int {
     return a + b;
 }
 
-func hello(name string) string {
-    return "hello:" + " " + name;
+func hello(name String) String {
+    return "hello" + " " + name;
 }
 
-let num = int add(1, 2);
-let phrase = string hello("Jeff");
-let i = int 0;
-let result = string "";
-
-for i < num {
-    i = i + 1
-    if (i == 2) {
-        result = hello("cat");
-    } else {
-        result = hello("dog");
-    }
-}
+let num = add(1, 2);
+let phrase = hello("Jeff");
+PRINT(phrase);
+PRINT(num);
