@@ -226,7 +226,7 @@ func evalInfixExpression(node *ast.InfixExpression) (string, error) {
 
 	node.Type = left // set type for code generation
 
-	methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUAL, "<": LT, ">": GT, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
+	methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUAL, "<": LT, ">": GT, "*": TIMES, "or": OR, "and": AND}
 
 	if !MethodExist(left, methods[node.Operator]) {
 		return NOTHING_TYPE, errors.New(fmt.Sprintf("method %s not exist for type %s", methods[node.Operator], left))

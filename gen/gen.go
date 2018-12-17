@@ -179,7 +179,7 @@ func genInfixExpression(node *ast.InfixExpression, b *bytes.Buffer) string {
 	kind := node.Type
 
 	tmp := freshTemp()
-	methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUAL, "<": LT, ">": GT, "*": TIMES, "/": DIVIDE, "or": OR, "and": AND}
+	methods := map[string]string{"+": PLUS, "-": MINUS, "==": EQUAL, "<": LT, ">": GT, "*": TIMES, "or": OR, "and": AND}
 
 	method, _ := GetMethod(kind, methods[node.Operator])
 	write(b, "%s %s = %s.%s(%s);\n", method.Return, tmp, left, methods[node.Operator], right)
